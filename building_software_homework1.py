@@ -2,6 +2,30 @@
 # Building Software Homework 1s
 # Student Name: Ka Ho (Gerald) Chan
 
+import argparse
+
+parser = argparse.ArgumentParser(description='Dataset analysis script')
+parser.add_argument('config', type=str, help='Path to the configuration file')
+parser.add_argument('output_filename', type=str, help='Name of the PNG file for plot output - without .png extension')
+args = parser.parse_args()
+
+# read arguments
+print(args.config)
+
+import yaml
+
+config_paths = []
+config_paths.append(args.config)
+print(config_paths)
+config = {}
+for path in config_paths:
+    with open(path, 'r') as f:
+        this_config = yaml.safe_load(f)
+        config.update(this_config)
+
+print(config)
+
+
 import numpy as np
 import pandas as pd
 
@@ -10,7 +34,7 @@ pd.set_option("display.max_columns", None)
 
 # Using engine='python' which is slower but more feature-complete. 
 # As the default value engine='c' option would issues warning about memory use due to column 18 having mixed types.
-fireIncidents = pd.read_csv('Chan_KaHo_python_assignment2_orig.csv', engine='python')
+fireIncidents = pd.read_csv(config['dataset'], engine='python')
 
 # Print out columns name
 colNames = list(fireIncidents.columns.values)
@@ -96,14 +120,14 @@ print('After dType Conversion\n')
 fireIncidents.dtypes
 
 # Original file format is CSV, so writing it out to JSON
-fireIncidents.to_json('Chan_KaHo_python_assignment2_proc.json')
+fireIncidents.to_json(config['output_filename']['json'])
 # Also writing the data out into CSV because of the submission instructions 
 # that required a 'LASTNAME_FIRSTNAME_python_assignment2_proc.csv' file:
 # Submit assignment via your Google Drive. Upload your 
 # (1) code file (LASTNAME_FIRSTNAME_python_assignment2_code.ipynb), 
 # (2) original data file (LASTNAME_FIRSTNAME_python_assignment2_orig.csv), and 
 # (3) processed DataFrame file (LASTNAME_FIRSTNAME_python_assignment2_proc.csv) 
-fireIncidents.to_csv('Chan_KaHo_python_assignment2_proc.csv')
+fireIncidents.to_csv(config['output_filename']['csv'])
 
 fireIncidents['TFS_Alarm_Month'] = fireIncidents['TFS_Alarm_Time'].dt.month
 # Verify new column is created and counts its content
@@ -160,9 +184,9 @@ import matplotlib.pyplot as plt
 fig, ax = plt.subplots()
 
 # Setting Title, Labels and Grid
-ax.set_title('Persons affected by Fire Incidents')
-ax.set_xlabel('Month')
-ax.set_ylabel('Persons')
+ax.set_title(config['plot_config']['title'])
+ax.set_xlabel(config['plot_config']['xlabel'])
+ax.set_ylabel(config['plot_config']['ylabel'])
 ax.set_axisbelow(True)
 ax.set_xticks(np.arange(0, 13, step=1),['', 'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'])
 ax.grid(alpha=0.3)
@@ -178,4 +202,4 @@ ax.legend([maxRecusedPerIncident, meanPersonsDisplaced, meanRespondingPersonnel]
           bbox_to_anchor=(1, 1),
           loc='upper left')
 
-fig.savefig('Building_Software_Homework1.png')
+fig.savefig(f'{args.output_filename}.png', bbox_inches='tight')
