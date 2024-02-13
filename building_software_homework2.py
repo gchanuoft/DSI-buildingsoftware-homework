@@ -119,16 +119,6 @@ fireIncidents['TFS_Arrival_Time'] = pd.to_datetime(fireIncidents['TFS_Arrival_Ti
 print('After dType Conversion\n')
 fireIncidents.dtypes
 
-# Original file format is CSV, so writing it out to JSON
-fireIncidents.to_json(config['output_filename']['json'])
-# Also writing the data out into CSV because of the submission instructions 
-# that required a 'LASTNAME_FIRSTNAME_python_assignment2_proc.csv' file:
-# Submit assignment via your Google Drive. Upload your 
-# (1) code file (LASTNAME_FIRSTNAME_python_assignment2_code.ipynb), 
-# (2) original data file (LASTNAME_FIRSTNAME_python_assignment2_orig.csv), and 
-# (3) processed DataFrame file (LASTNAME_FIRSTNAME_python_assignment2_proc.csv) 
-fireIncidents.to_csv(config['output_filename']['csv'])
-
 fireIncidents['TFS_Alarm_Month'] = fireIncidents['TFS_Alarm_Time'].dt.month
 # Verify new column is created and counts its content
 fireIncidents['TFS_Alarm_Month'].value_counts().sort_index()
