@@ -1,5 +1,5 @@
 # UofT - DSI / Python
-# Building Software Homework 1
+# Building Software Homework 2
 # Student Name: Ka Ho (Gerald) Chan
 
 import argparse
