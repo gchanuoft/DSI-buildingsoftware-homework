@@ -34,7 +34,15 @@ pd.set_option("display.max_columns", None)
 
 # Using engine='python' which is slower but more feature-complete. 
 # As the default value engine='c' option would issues warning about memory use due to column 18 having mixed types.
-fireIncidents = pd.read_csv(config['dataset'], engine='python')
+fileName = config['dataset']
+try:
+    fireIncidents = pd.read_csv(fileName, engine='python')
+except FileNotFoundError as e:
+    e.add_note(f'The file {fileName} cannot be found')
+    raise e
+
+assert fireIncidents.shape[0] > 0, 'Input file has no data'
+
 
 # Print out columns name
 colNames = list(fireIncidents.columns.values)
