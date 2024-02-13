@@ -3,11 +3,29 @@
 # Student Name: Ka Ho (Gerald) Chan
 
 import argparse
+import logging
+import datetime
 
 parser = argparse.ArgumentParser(description='Dataset analysis script')
 parser.add_argument('config', type=str, help='Path to the configuration file')
 parser.add_argument('output_filename', type=str, help='Name of the PNG file for plot output - without .png extension')
+parser.add_argument('--verbose', '-v', action='store_true', help='Print verbose logs')
 args = parser.parse_args()
+
+# Determine logging level based on arguments
+logging_level = logging.DEBUG if args.verbose else logging.WARNING
+
+# Initialize logging module
+logging.basicConfig(
+    level=logging_level,
+    handlers=[logging.StreamHandler(),
+              logging.FileHandler('building_software_homework2.log')],
+)
+
+# Get a timestamp
+now = datetime.datetime.now()
+
+logging.info(f'{now.strftime("%m/%d/%Y, %H:%M:%S")}:building_software_homework2 starting')
 
 # read arguments
 print(args.config)
@@ -34,15 +52,19 @@ pd.set_option("display.max_columns", None)
 
 # Using engine='python' which is slower but more feature-complete. 
 # As the default value engine='c' option would issues warning about memory use due to column 18 having mixed types.
+logging.info(f'{now.strftime("%m/%d/%Y, %H:%M:%S")}:Opening CSV file')
 fileName = config['dataset']
 try:
     fireIncidents = pd.read_csv(fileName, engine='python')
 except FileNotFoundError as e:
     e.add_note(f'The file {fileName} cannot be found')
+    logging.error(f'{now.strftime("%m/%d/%Y, %H:%M:%S")}:FileNotFoundError - file name is {fileName}')
     raise e
 
-assert fireIncidents.shape[0] > 0, 'Input file has no data'
-
+csvFileNumRow = fireIncidents.shape[0]
+if csvFileNumRow < 1:
+    logging.error(f'{now.strftime("%m/%d/%Y, %H:%M:%S")}:Input file {fileName} has no data')
+    assert False, 'Input file has no data'
 
 # Print out columns name
 colNames = list(fireIncidents.columns.values)
@@ -200,4 +222,6 @@ ax.legend([maxRecusedPerIncident, meanPersonsDisplaced, meanRespondingPersonnel]
           bbox_to_anchor=(1, 1),
           loc='upper left')
 
-fig.savefig(f'{args.output_filename}.png', bbox_inches='tight')
+pngFileName = args.output_filename + '.png'
+logging.info(f'{now.strftime("%m/%d/%Y, %H:%M:%S")}:Creating image file {pngFileName}')
+fig.savefig(pngFileName, bbox_inches='tight')
