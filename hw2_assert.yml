@@ -1,0 +1,8 @@
+dataset: Chan_KaHo_python_assignment2_orig.csv
+plot_config:
+  title: Persons affected by Fire Incidents
+  xlabel: Month
+  ylabel: Persons
+output_filename:
+  json: Chan_KaHo_python_assignment2_proc.json
+  csv: Chan_KaHo_python_assignment2_proc.csv
