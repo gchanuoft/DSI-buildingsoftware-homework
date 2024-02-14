@@ -30,3 +30,16 @@ print(studiesByCat)
 studiesBySubCat = studiesPD.groupby('subcategory').agg(Num_of_Studies_Per_Subcateglory=('file_name', 'count'))
 print('\n\n\nNumber of Studies Per Subcategory\n')
 print(studiesBySubCat)
+
+########## Task 2 ##########
+topic = 'dsi_c2_brs'
+title = 'OSD-100 subcateglory with most studies'
+studiesBySubCat = studiesBySubCat.sort_values(by=['Num_of_Studies_Per_Subcateglory'], ascending=False)
+message = f'In ODS-{studiesID}, the subcateglory "{studiesBySubCat.index[0]}" has most studies, with {studiesBySubCat["Num_of_Studies_Per_Subcateglory"].iloc[0]} in total.'
+
+# send a message through ntfy.sh
+requests.post(
+    'https://ntfy.sh/' + topic,
+    data=message.encode('utf-8'),
+    headers={'Title': title}
+)
