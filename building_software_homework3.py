@@ -10,6 +10,24 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+def pdAllStrToOneCol(originalDataFrame):
+
+    if not isinstance(originalDataFrame, pd.core.frame.DataFrame):
+        raise TypeError('pdAllStrToOneCol() requires type pandas.core.frame.DataFrame as parameter')
+    if originalDataFrame.size == 0:
+        raise ValueError('Input Data frame cannot be empty')
+    result = pd.DataFrame()
+
+    # According to select_dtypes() documentation, selecting string should use 'object' type
+    # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.select_dtypes.html
+    stringColumns = originalDataFrame.select_dtypes(include='object')
+    # Put all the values from all the string columns into 1 column in a new dataframe
+    for columnName, data in stringColumns.items():
+        result = pd.concat([result, data],
+                               axis=0,
+                               ignore_index=True)
+    return result
+
 parser = argparse.ArgumentParser(description='Dataset analysis script')
 parser.add_argument('config', type=str, help='Path to the configuration file')
 parser.add_argument('output_filename', type=str, help='Name of the PNG file for plot output - without .png extension')
@@ -23,13 +41,13 @@ logging_level = logging.DEBUG if args.verbose else logging.WARNING
 logging.basicConfig(
     level=logging_level,
     handlers=[logging.StreamHandler(),
-              logging.FileHandler('building_software_homework2.log')],
+              logging.FileHandler('building_software_homework3.log')],
 )
 
 # Get a timestamp
 now = datetime.datetime.now()
 
-logging.info(f'{now.strftime("%m/%d/%Y, %H:%M:%S")}:building_software_homework2 starting')
+logging.info(f'{now.strftime("%m/%d/%Y, %H:%M:%S")}:building_software_homework3 starting')
 
 config_paths = []
 config_paths.append(args.config)
@@ -81,17 +99,7 @@ numericColumns.select_dtypes(include=np.number).mean().round(2)
 print('Median values for numeric columns\n')
 numericColumns.select_dtypes(include=np.number).median().round(2)
 
-# According to select_dtypes() documentation, selecting string should use 'object' type
-# https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.select_dtypes.html
-stringColumns = fireIncidents.select_dtypes(include='object')
-allStrings = pd.DataFrame()
-
-# Put all the values from all the string columns into 1 column in a new dataframe
-for columnName, data in stringColumns.items():
-    allStrings = pd.concat([allStrings, data],
-                          axis=0,
-                          ignore_index=True)
-
+allStrings = pdAllStrToOneCol(fireIncidents)
 allStringValueCount = allStrings.value_counts()
 
 # Most common value.  
